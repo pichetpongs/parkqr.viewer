@@ -1,0 +1,46 @@
+[
+  {
+    "outputFileName": "mtlx/resource/js/main.min.js",
+    "inputFiles": [
+      "mtlx/resource/js/lib/object.js",
+      "mtlx/resource/js/main.js"
+    ]
+  },
+  {
+    "outputFileName": "demo/resource/js/main.min.js",
+    "inputFiles": [
+      "demo/resource/js/lib/object.js",
+      "demo/resource/js/main.js"
+    ]
+  },
+  {
+    "outputFileName": "mtlx/resource/style/css/main.min.css",
+    "inputFiles": [
+      "mtlx/resource/style/css/main.css"
+    ]
+  },
+  {
+    "outputFileName": "demo/resource/style/css/main.min.css",
+    "inputFiles": [ "demo/resource/style/css/main.css" ]
+  },
+  {
+    "outputFileName": "nist1/resource/js/main.min.js",
+    "inputFiles": [
+      "nist1/resource/js/lib/object.js",
+      "nist1/resource/js/main.js"
+    ]
+  },
+  {
+    "outputFileName": "nist1/resource/style/css/main.min.css",
+    "inputFiles": [
+      "nist1/resource/style/css/main.css"
+    ]
+  },
+  {
+    "outputFileName": "nist2/resource/js/main.min.js",
+    "inputFiles": [
+      "nist2/resource/js/lib/object.js",
+      "nist2/resource/js/main.js"
+    ]
+  }
+]
