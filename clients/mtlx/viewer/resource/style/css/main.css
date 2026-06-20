@@ -365,7 +365,7 @@ body div.info div.item .value.phone {
 }
 body div.info div.item .value.phone a {
   padding-left: 30px;
-  background-image: url("../image/common/ico-phone.png");
+  background-image: url("../../image/common/ico-phone-light.png");
   background-repeat: no-repeat;
   background-size: 22px;
   background-position: 0px 50%;
