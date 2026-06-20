@@ -1,1 +1,14 @@
-﻿[]
+﻿[
+  {
+    "outputFile": "mtlx/resource/style/css/main.css",
+    "inputFile": "mtlx/resource/style/scss/main.scss"
+  },
+  {
+    "outputFile": "mtlx/viewer/resource/style/scss/main.css",
+    "inputFile": "mtlx/viewer/resource/style/scss/main.scss"
+  },
+  {
+    "outputFile": "clients/mtlx/viewer/resource/style/css/main.css",
+    "inputFile": "clients/mtlx/viewer/resource/style/scss/main.scss"
+  }
+]

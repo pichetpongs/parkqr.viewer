@@ -659,8 +659,8 @@ body {
 
     div#modal-pin{
         div.modal-content{
-            width:90%;
-            max-width:340px;
+            width:80%;
+            max-width:290px;
             background:#fff;
             border-radius:10px;
             padding:24px;
@@ -674,11 +674,11 @@ body {
                 display:flex;
                 justify-content:center;
                 gap:10px;
-                margin:20px 0;
+                margin:15px 0;
 
                 input.otp{
-                    width:48px;
-                    height:56px;
+                    width:42px;
+                    height:50px;
 
                     border:1px solid #d9d9d9;
                     border-radius:10px;
@@ -716,6 +716,8 @@ body {
      }
    
 
+    
+
 }
 
 
@@ -745,3 +747,4 @@ body {
         background-position: -200% 0;
     }
 }
+

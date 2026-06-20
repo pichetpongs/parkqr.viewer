@@ -24,7 +24,7 @@ const INSTANCE  = 'Viewer';
 
 NS(NAMESPACE, NAMECLASS, (() => {
 
-    const VERSION     = "2.0.4";
+    const VERSION     = "2.1.1";
     const CODE_CLIENT = "mtlx"; //กำหนดรหัสของ client 
 
     const API_ACTION = {
@@ -62,11 +62,11 @@ NS(NAMESPACE, NAMECLASS, (() => {
             let keys = code.split('.');
             let res
             keys.forEach(function (n) {
-                if (!lang[n]) {  return 0; }
-                if (lang[n].isObject()) { lang = lang[n]; return 0;}
+                if (!lang[n]) { return 0; }
+                if (lang[n].isObject()) { lang = lang[n]; return 0; }
                 //-----
                 res = lang[n];
-                
+
             });
 
             return res;
@@ -98,7 +98,14 @@ NS(NAMESPACE, NAMECLASS, (() => {
             "option": "-- Please select -- ",
             "option-province": "-- Please select province -- ",
             //-----
-
+            modal:{
+                passkey: {
+                    "topic": "View more information",
+                    "title": "Please enter user's pin.",
+                    "btn-submit": "Confrim",
+                    "btn-cancel": "Cancel",
+                }
+            },
             //-----
             "caution": "If you need to update or change parking permit information,<br>please contact the juristic person office.",
             "disclaimer": "METROLUXE Kaset Condominium<br>Juristic Person Office<br>39 Phahonyothin, Sena Nikhom Subdistrict,<br>Chatuchak District, Bangkok 10900",
@@ -107,6 +114,9 @@ NS(NAMESPACE, NAMECLASS, (() => {
                 "text": "This sticker has been reported lost.<br>Possession or use is prohibited.<br>Please return it to the Juristic Person Office immediately.",
                 "label-no": "Sticker no. : ",
                 "date-lost":"Lost date : "
+            },
+            subscript: {
+                "text":"Your subscription has expired.<br/>Please contact your service provider to renew."
             },
             "message": {
                 "data-operate": {
@@ -158,7 +168,15 @@ NS(NAMESPACE, NAMECLASS, (() => {
             "btn-regist" : "ลงทะเบียนสติกเกอร์",
             "option": "-- โปรดระบุ -- ",
             "option-province": "-- โปรดระบุจังหวัด -- ",
-
+            //-----
+            modal: {
+                passkey: {
+                    "topic": "รายละเอียดเพิ่มเติม",
+                    "title": "กรุณากรอกรหัสผ่าน 5 หลัก",
+                    "btn-submit": "ยืนยัน",
+                    "btn-cancel": "ยกเลิก",
+                }
+            },
             //-----
             "caution": "ต้องการแก้ไขข้อมูลผู้รับสิทธิ์/ข้อมูลยานพาหนะ<br>กรุณาติดต่อสำนักงานนิติบุคคล<br>ในวันและเวลาทำการ",
             "disclaimer": "นิติบุคคลอาคารชุดเมโทรลักซ์-เกษตร<br>39 ถนนประเสริฐมนูกิจ แขวงเสนานิคม เขตจตุจักร<br>กรุงเทพมหานคร 10900",    
@@ -169,6 +187,9 @@ NS(NAMESPACE, NAMECLASS, (() => {
                 "label-no": "สติกเกอร์หมายเลข : ",
                 "date-lost": "วันที่แจ้งหาย : "
             },
+            subscript: {
+                "text": "ครบกำหนดวันอนุญาติใช้งานแล้ว<br/>หวังว่าระบบของเราได้อำนวยความสะดวกแก่ท่าน<br/>หากสนใจใช้งานต่อเนื่อง<br/>กรุณาติดต่อผู้ให้บริการ"
+            },
             message: {
                 "data-operate": {
                     "ing"   : "<h1>... กำลังค้นหา ...</h1>",
@@ -177,7 +198,7 @@ NS(NAMESPACE, NAMECLASS, (() => {
                     "not-allow": "... ไม่อนุญาติให้เข้าถึง/รหัสผ่านไม่ถูกต้อง ...",
                     "regist": "... กำลังบันทึกรายการ โปรดรอ ...",
                     "regist-inc": "... บันทึกรายการไม่สำเร็จ โปรดลองอีกครั้ง ...",
-                    "regist-cmp": "... ลงทะเบียนสำเร็จ ...",
+                    "regist-cmp": "... ลงทะเบียนสำเร็จ ..."
                 },
                 "vehicle-notfound":"ไม่พบข้อมูลยานพาหนะที่ลงทะเบียน<br>โปรดติดต่อสำนักงานนิติบุคคล",
                 "lost": "สติกเกอร์นี้ถูกลงบันทึกประจำวันแล้วว่าสูญหาย <br />การครอบครองหรือนำไปใช้งานต่อ<br />จะถือว่าไม่ชอบด้วยระเบียบของนิติบุคคล <br /> หากพบเห็นกรุณานำส่งสำนักงานนิติบุคคลทันที",
@@ -200,6 +221,7 @@ NS(NAMESPACE, NAMECLASS, (() => {
 
     var I18N_CODE = "th-TH";
     var PARAM_IPADDR = "";    //เก็บข้อมูล ip-addr จากการดึงข้อมูล
+    var PARAM_POSITION = "";  //เก็บข้อมูล position เครื่องที่ทำการแสกน
     var PARAM_PERMIT_QR = ""; //เก็บข้อมูล qr-code จาก require-url
 
     function TTL_LOCALSTOREAGE(prefix) {
@@ -265,6 +287,8 @@ NS(NAMESPACE, NAMECLASS, (() => {
     Main.prototype = {
         constructor: Main,
         //-----
+        data: undefined,
+        //-----
         component: {
             "body": "body",
             "container": 'div#container',
@@ -279,6 +303,12 @@ NS(NAMESPACE, NAMECLASS, (() => {
             "infoLost": '#info-lost',
             "infoNotFound": '#info-notfound',
             "caution": '.caution',
+            "modalPin": {
+                self: "#modal-pin",
+                btnSubmit: "button#btn-submit",
+                btnCancel: "button#btn-cancel",
+                input: "input",
+            },
             "form": {
                 self: '#frm-regist',
                 label_no: "input#label-no",
@@ -307,7 +337,8 @@ NS(NAMESPACE, NAMECLASS, (() => {
                     if (val.isFunction()) return 0;
                     if (val.isObject()) { cps[key] = init_component(val); return 0; }
                     //-----
-                    cps[key] = self.querySelector(val);
+                    cps[key] = self.querySelectorAll(val);
+                    if (cps[key].length == 1) cps[key] = cps[key][0];
                     if (key == "self") self = cps[key];
                 });
                 return cps;
@@ -358,6 +389,8 @@ NS(NAMESPACE, NAMECLASS, (() => {
 
             init_component(me.component);
             init_switchlang(me.component.switchLanguage)
+            //-----
+            this.render_skeleton();
 
             cp.body.addEventListener("onFetchData", function (e) { me.render_info(e.data); });
 
@@ -366,8 +399,36 @@ NS(NAMESPACE, NAMECLASS, (() => {
             return this;
         },
         render: function () {
-            
+            let me = this;
+            let cp = me.component;
+            //-----
 
+
+            cp.modalPin.btnSubmit.addEventListener("click", function (e) {
+                me.fetch_data.private.call(me);
+            });
+            cp.modalPin.btnCancel.addEventListener("click", function (e) {
+                me.display_passkey(false);
+            });
+            cp.modalPin.input.forEach(function (el, idx) {
+                el.addEventListener("input", function (e) {
+                    e.target.value = e.target.value.replace(/\D/g, "");
+
+                    if (e.target.value && idx < cp.modalPin.input.length - 1) {
+                        cp.modalPin.input[idx + 1].focus();
+                    }
+
+                    let value = [...cp.modalPin.input].map(x => x.value).join("");
+                    if (value.length == 5) { me.fetch_data.private.call(me);}
+
+                });
+                el.addEventListener("keydown", function (e) {
+                    if (e.key === "Backspace" && !el.value && idx > 0) {
+                        cp.modalPin.input[idx - 1].focus();
+                    }   
+                });
+            });
+            
             return this;
         },
         reset: function () {
@@ -443,6 +504,9 @@ NS(NAMESPACE, NAMECLASS, (() => {
             //------
             this.display_error("");
             //------
+            cp.infoArea01.innerHTML = "";
+            cp.infoArea02.innerHTML = "";
+            //-----
             cp.container.classList.add("not-found");
             cp.container.classList.remove("loader");
             cp.container.classList.add("ready");
@@ -459,17 +523,115 @@ NS(NAMESPACE, NAMECLASS, (() => {
                 <br><span data-lang="lost.label-no">สติกเกอร์หมายเลข</span>${data["label-no"]}
                 <br><span data-lang="lost.date-lost">วันที่แจ้งหาย</span>${new Date(data["datetime-update"]).toLocaleDateString(I18N_CODE, FMT_DATESHORT)}`;
             me.display_error();
-
+            //-----
+            cp.infoArea01.innerHTML = "";
+            cp.infoArea02.innerHTML = "";
+            //-----
             cp.container.classList.add("lost");
             cp.container.classList.remove("loader");
             cp.container.classList.add("ready");
             
             this.switch_language();
         },
+        display_unsubscription: function (data) {
+            let me = this;
+            let cp = me.component;
+            //------
+            this.display_error("");
+            //-----
+            cp.infoArea01.innerHTML = "";
+            cp.infoArea02.innerHTML = "";
+            //------
+            cp.container.classList.add("unsubscription");
+            cp.container.classList.remove("loader");
+            cp.container.classList.add("ready");
+            //-----
+            this.switch_language();
+        },
+        display_unregistration: function (data) {
+            let me = this;
+            let cp = me.component;
+            //------
+            this.display_error("");
+            //-----
+            cp.infoArea01.innerHTML = "";
+            cp.infoArea02.innerHTML = "";
+            //------
+            cp.container.classList.add("unregistration");
+            cp.container.classList.remove("loader");
+            cp.container.classList.add("ready");
+            //-----
+            this.switch_language();
+        },
+        display_passkey: function (isVisible) {
+            let me = this;
+            let cp = me.component;
+            //------
+            cp.modalPin.input.forEach(el => el.value = "");
+            isVisible ? cp.container.classList.add("passkey") : cp.container.classList.remove("passkey");
+            //-----
+            cp.modalPin.input[0].focus();
+            //-----
+            this.switch_language();
+        },
         //-----
+        render_skeleton: function () {
+            let me = this;
+            let cp = me.component;
+
+            cp.form.self.style.display = "none";
+            cp.caution.style.display = "none";
+
+            function render_item(caption = "", value = "", clang_key = "", vlang_key = "", itemClass = "", valueClass = '', item_type = undefined) {
+
+                //-----                                        
+                let display_value = value;
+                //-----
+                if (item_type == "a") display_value = `<a href="tel:${value.replace(/\D/g, '')}">${value}</a>`;
+                if (item_type == "date") {
+                    const opt_date = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+                    display_value = `<span data-lang="date" data-value="${value}">${new Date(value).toLocaleDateString(I18N_CODE, FMT_DATELONG)}</span>`;
+                }
+
+                return `
+                    <div class="item loading">
+                        <div class="label" data-lang = "${clang_key}">${caption}</div>
+                        <div class="value" style ="min-width:${(Math.random() * 20) + 30}%"></div>
+                    </div>`;
+
+            }
+
+            cp.infoArea01.innerHTML = `
+                <h1 data-lang="header01">ข้อมูลผู้ใช้สิทธิ์จอดยานพาหนะ</h1>
+                ${render_item("ลำดับสติกเกอร์", "", "label-no")}
+
+                ${render_item("ประเภท", "", "label-type")}
+
+                ${render_item("วันลงทะเบียน", "", "datetime-regist", "", "", "", "date")}
+                ${render_item("วันหมดอายุ", "", "date-expire", "", "", "expired", "date")}
+
+                <button id="btn-detail" class="disabled loading">&nbsp;</button>
+            `;
+
+            cp.infoArea02.innerHTML = `
+                <h2 data-lang = "header-vehicle01">ยานพาหนะ #1</h2>
+                ${render_item("ประเภทยานพาหนะ", "", "label-no")}
+                ${render_item("เลขทะเบียน", "", "label-type")}
+                ${render_item("จังหวัดจดทะเบียน", "", "datetime-regist", "", "", "", "date")}
+            `;
+
+
+            this.switch_language();
+            
+
+        },
         render_info: function (data, is_private = false) {
             let me = this;
             let cp = me.component;
+            //-----
+            me.data = data;
+            //-----
 
             cp.form.self.style.display = "none";
             cp.caution.style.display = "none";
@@ -491,11 +653,10 @@ NS(NAMESPACE, NAMECLASS, (() => {
                 return `
                     <div class="item ${itemClass}">
                         <div class="label" data-lang = "${clang_key}">${caption}</div>
-                        <div class="value ${valueClass}" data-lang = "${vlang_key}">${display_value}</div>
+                        <div class="value ${valueClass}" data-lang = "${vlang_key}">${display_value}<div class="skeleton"></div></div>
                     </div>`;
 
             }
-
 
             cp.infoArea01.innerHTML = `
                 <h1 data-lang="header01">ข้อมูลผู้ใช้สิทธิ์จอดยานพาหนะ</h1>
@@ -544,11 +705,16 @@ NS(NAMESPACE, NAMECLASS, (() => {
 
             !is_private && document
                 .querySelector("button#btn-detail")
-                .addEventListener("click", function (e) { me.fetch_data.private.call(me); });
+                .addEventListener("click", function (e) {
+                    me.display_passkey(true);
+                });
 
             cp.caution.style.display = "block";
 
             this.display_error();
+
+            cp.container.classList.remove("loader");
+            cp.container.classList.add("ready");
             
         },
         render_form: function (data) {
@@ -638,7 +804,7 @@ NS(NAMESPACE, NAMECLASS, (() => {
         fetch_data: {
 
             /**
-             *  ดึงข้อมูล ipaddress จากการเรียกข้อมูล
+             * ดึงข้อมูล ipaddress จากการเรียกข้อมูล
              * @returns
              */
             ipaddr: async function () {
@@ -664,7 +830,12 @@ NS(NAMESPACE, NAMECLASS, (() => {
                     return "";
                 }
             },
-            
+            /**ดึงข้อมูล geo-location*/
+            position: function (fnR) {
+                return new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition( resolve, reject,{ enableHighAccuracy: true });
+                });
+            },
             public: async function () {
 
                 let me = this;
@@ -673,18 +844,16 @@ NS(NAMESPACE, NAMECLASS, (() => {
                 if (cp.container.classList.contains("loader")) return 0;
                 //-----
                 cp.container.classList.remove("lost");
-
-                me.display_error(I18N.get_text("message.data-operate.ing"), "message.data-operate.ing");
-
-                //-----
-                cp.infoArea01.innerHTML = "";
-                cp.infoArea02.innerHTML = "";
-
+                cp.container.classList.remove("ready");
                 cp.container.classList.add("loader");
+
+                me.render_skeleton();
+
                 //-----
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
                 PARAM_IPADDR = PARAM_IPADDR != "" ? PARAM_IPADDR : await me.fetch_data.ipaddr.call(me);
+                PARAM_POSITION = PARAM_POSITION != "" ? PARAM_POSITION : await me.fetch_data.position.call(me);
 
                 const controller = new AbortController();
                 const tid = setTimeout(() => controller.abort(), TIMEOUT_FETCH);
@@ -701,7 +870,12 @@ NS(NAMESPACE, NAMECLASS, (() => {
                             "action"        : API_ACTION["permit-public"], 
                             "user-agent"    : navigator.userAgent,
                             "ip-addr"       : PARAM_IPADDR,
-                            "opt-direct": OPT_DIRECT,
+                            "position": {
+                                lat: PARAM_POSITION.coords ? PARAM_POSITION.coords.latitude : 0.00,
+                                lng: PARAM_POSITION.coords ? PARAM_POSITION.coords.longitude:0.00,
+                                acc: PARAM_POSITION.coords ? PARAM_POSITION.coords.accuracy:0.00
+                            },
+                            "opt-direct"    : OPT_DIRECT,
                             //-----
                             "permit-qr"     : PARAM_PERMIT_QR
                         })
@@ -719,17 +893,17 @@ NS(NAMESPACE, NAMECLASS, (() => {
                     if (!res) { me.display_error(I18N.get_text("message.data-operate.error"), "message.data-operate.error"); return; }
                     //-----
                     if (res && res.status == "fail") { me.display_notfound();  return; }
-                    if (res && res.status == "") { me.display_notfound();  return; }
+                    if (res && res.status == "") { me.display_notfound(); return; }
+                    //-----
+                    if (res && res.config && !res.config["is-subscription"]) { me.display_unsubscription(res.data); return 0; }
+                    if (res && res.config && !res.config["is-registration"]) { me.display_unregistration(res.data); return 0; }
                     //-----
                     if (!res.data) { me.display_notfound(); return; }
-
                     if (res.data["is-lost"]) { me.display_lost(res.data); return 0;}
                     if (!res.data["is-regist"]) { me.render_form(res.data); return 0; }
 
                     me.render_info(res.data);
 
-                    cp.container.classList.remove("loader");
-                    cp.container.classList.add("ready");
                 } catch (e) {
 
                     clearTimeout(tid);
@@ -737,6 +911,8 @@ NS(NAMESPACE, NAMECLASS, (() => {
 
                     me.display_error(I18N.get_text("message.data-operate.error"), "message.data-operate.error");
                     cp.container.classList.remove("loader");
+
+                    me.data?me.render_info(me.data):"";
 
                 }
                 
@@ -748,20 +924,28 @@ NS(NAMESPACE, NAMECLASS, (() => {
                 //-----
                 let key = ttlStore.get(STORE_VALUE_PASSKEY);  //อ่านข้อมุล pass-key จาก localstorage
 
-                if (cp.container.classList.contains("loader")) return 0;
+                if (cp.container.classList.contains("loader")) return 0; //ยังคงโหลดข้อมูลให้ยกเลิก
                 //-----
-                key = key ? key : prompt(I18N.get_text("message.password"));
+                key = key ? key : [...cp.modalPin.input].map(x => x.value).join("");
                 if (key == "" || !key) return 0;   
+
+                //-----
+                me.display_passkey(false);
+                me.display_error();
                 //-----
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 //-----
-                cp.infoArea01.innerHTML == ""
-                    ? me.display_error(I18N.get_text("message.data-operate.ing"), "message.data-operate.ing")
-                    : me.display_error(I18N.get_text("message.data-operate.access"), "message.data-operate.access");
+                //cp.infoArea01.innerHTML == ""
+                  //  ? me.display_error(I18N.get_text("message.data-operate.ing"), "message.data-operate.ing")
+                    //: me.display_error(I18N.get_text("message.data-operate.access"), "message.data-operate.access");
 
+                me.render_skeleton();
+
+                cp.container.classList.remove("ready");
                 cp.container.classList.add("loader");
 
                 PARAM_IPADDR = PARAM_IPADDR != "" ? PARAM_IPADDR:  await me.fetch_data.ipaddr.call(me);
+                PARAM_POSITION = PARAM_POSITION != "" ? PARAM_POSITION : await me.fetch_data.position.call(me);
 
                 const controller = new AbortController();
                 const tid = setTimeout(() => controller.abort(), TIMEOUT_FETCH);
@@ -778,6 +962,11 @@ NS(NAMESPACE, NAMECLASS, (() => {
                             "action"        : API_ACTION["permit-private"],
                             "user-agent"    : navigator.userAgent,
                             "ip-addr"       : PARAM_IPADDR,
+                            "position"      : {
+                                lat: PARAM_POSITION.coords ? PARAM_POSITION.coords.latitude : 0.00,
+                                lng: PARAM_POSITION.coords ? PARAM_POSITION.coords.longitude : 0.00,
+                                acc: PARAM_POSITION.coords ? PARAM_POSITION.coords.accuracy : 0.00
+                            },
                             "opt-direct"    : OPT_DIRECT,
                             //-----
                             "permit-qr"     : PARAM_PERMIT_QR,
@@ -794,11 +983,13 @@ NS(NAMESPACE, NAMECLASS, (() => {
                     const res = await response.json();
 
                     if (!res) {
+                        me.render_info(me.data);
                         me.display_error(I18N.get_text("message.data-operate.error"), "message.data-operate.error");
                         return;
                     }
 
                     if (res && res.status == "fail") {
+                        me.render_info(me.data);
                         me.display_error(I18N.get_text("message.data-operate.not-allow"), "message.data-operate.not-allow");
                         return;
                     }
@@ -823,8 +1014,6 @@ NS(NAMESPACE, NAMECLASS, (() => {
 
                     !ttlStore.get(STORE_VALUE_PASSKEY) && ttlStore.set(STORE_VALUE_PASSKEY, key, STORE_TTL_PASSKEY);
 
-                    cp.container.classList.remove("loader");
-                    cp.container.classList.add("ready");
 
                 } catch (e) {
                     clearTimeout(tid);
@@ -832,7 +1021,8 @@ NS(NAMESPACE, NAMECLASS, (() => {
                     console.log(e.message);
                     //----
                     this.display_error(I18N.get_text("message.data-operate.error"));
-                    cp.container.classList.remove("loader");
+                    //----
+                    me.render_info(me.data, true);
                 }
 
             },
@@ -903,6 +1093,18 @@ NS("App.Module", INSTANCE, new (NS(NAMESPACE, NAMECLASS))());
 
 /**
  * HISTORY
+ * 
+ * 20260615:2.2.0
+ * - Added : เพิ่มการแสดงผลเมื่อไม่ต่ออายุการใช้งาน
+ * - Added : เพิ่มการแสดงผลเมื่อสติกเกอร์ที่ยังไมได้ลงทะเบียนหมดอายุ
+ * - Added : เปลี่ยนการแสดงผลการโหลดข้อมูลเป็น skeleton-loader
+ * - Added : เปลี่ยนการแสดงผลคำสั้่ง prompt เพื่อขอรหัสผ่านเป็นการใช้ css-modal แทน
+ * 
+ * 20260608:2.1.0
+ * - Added : เพิ่มการเก็บค่า Geo-Location จากผู้แสกนเพื่อระบุตำแหน่ง
+ * 
+ * 20260304:2.0.7
+ * - Fixed : กำหนดค่า content-type ของ fetch() เป็น "plain-text" ให้ตรงกับ appscript เพื่อให้เงิอนไขตรงกันผ่านไปยัง json.parse()
  * 
  * 20251114:2.0.4
  * - Moded : แก้ไขเวลาของ localstorage:key เป็น 4 ชั่วโมง

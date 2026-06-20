@@ -2,8 +2,15 @@
   {
     "outputFileName": "mtlx/resource/js/main.min.js",
     "inputFiles": [
+      "mtlx/resource/js/lib/string.js",
       "mtlx/resource/js/lib/object.js",
       "mtlx/resource/js/main.js"
+    ]
+  },
+  {
+    "outputFileName": "mtlx/resource/style/css/main.min.css",
+    "inputFiles": [
+      "mtlx/resource/style/css/main.css"
     ]
   },
   {
@@ -14,14 +21,10 @@
     ]
   },
   {
-    "outputFileName": "mtlx/resource/style/css/main.min.css",
-    "inputFiles": [
-      "mtlx/resource/style/css/main.css"
-    ]
-  },
-  {
     "outputFileName": "demo/resource/style/css/main.min.css",
-    "inputFiles": [ "demo/resource/style/css/main.css" ]
+    "inputFiles": [
+      "demo/resource/style/css/main.css"
+    ]
   },
   {
     "outputFileName": "nist1/resource/js/main.min.js",
@@ -41,6 +44,17 @@
     "inputFiles": [
       "nist2/resource/js/lib/object.js",
       "nist2/resource/js/main.js"
+    ]
+  },
+  {
+    "outputFileName": "clients/mtlx/viewer/resource/script/main.min.js",
+    "inputFiles": [
+      "_core/_common/resource/script/lib/string.js",
+      "_core/_common/resource/script/lib/object.js",
+      "_core/_common/resource/script/lib/utility.js",
+      "_core/_common/resource/script/base.js",
+      "_core/apps/viewer/resource/script/viewer.js",
+      "clients/mtlx/viewer/resource/script/main.js"
     ]
   }
 ]

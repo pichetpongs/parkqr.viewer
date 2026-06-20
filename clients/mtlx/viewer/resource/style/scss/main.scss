@@ -1,0 +1,90 @@
+﻿
+@import "../../../../../../_core/apps/viewer/resource/style/scss/viewer";
+
+$color-body:#f6f6f6;
+$color-text:#0F3D3E;
+$color-footer:#95a5a6;
+//-----
+$color-button :#D6B166;
+$color-error  : #b33939;
+
+$fontsize :18px;
+$fontsize-header: 20px;
+$border-radius : 10px;
+
+$logo-height: 170px;
+
+:root{
+    --color-body   : #{$color-body};
+    --color-text   : #{$color-text};
+    --color-footer : #{$color-footer};
+    --color-button : #{$color-button};
+    --color-error  : #{$color-error};
+    
+    --fontsize : #{$fontsize};
+    --fontsize-header:#{$fontsize-header};
+
+    --border-radius :#{$border-radius};
+
+    --logo-height:#{$logo-height};
+}
+
+body{
+    
+    div.info{
+        div.item{
+
+            &.vehicle-type-car1 {
+                .value { background-image: url('../../image/vehicle-type-car06.png'); }
+            }
+            &.vehicle-type-car2 {
+                .value { background-image: url('../../image/vehicle-type-car02.png'); }
+            }
+
+            &.vehicle-type-bike1 {
+                .value {  background-image: url('../../image/vehicle-type-bike01.png'); }
+            }
+        }
+
+        &#info-lost {
+            //background-image: url('../image/common/info-lost.png');
+        }
+        &#info-notfound {
+            //background-image: url('../image/common/info-notfound.png');
+        }
+        &#info-unsubscription {
+            //background-image: url('../image/common/info-unsubscription.png');
+        }
+        &#info-unregistration {
+            //background-image: url('../image/common/info-unregistration.png');
+        }
+
+    }
+
+    div#frm-regist{
+        div.field-vehicle{
+            &.vehicle-type-car {
+
+                div.field-vehicle {
+                    display: block;
+
+                    div { background-image: url('../image/vehicle-type-car06.png');}
+
+                    &:nth-of-type(2) { div { background-image: url('../image/vehicle-type-car02.png');}}
+                }
+            }
+
+        &.vehicle-type-bike {
+            div.field-vehicle {
+                display: block;
+
+                div { background-image: url('../image/vehicle-type-bike01.png'); }
+
+                &:nth-of-type(2) { display: none; }
+ 
+            }
+        }
+        }
+    }
+
+}

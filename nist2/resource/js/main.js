@@ -24,7 +24,7 @@ const INSTANCE  = 'Viewer';
 
 NS(NAMESPACE, NAMECLASS, (() => {
 
-    const VERSION     = "2.0.6";
+    const VERSION     = "2.1.0";
     const CODE_CLIENT = "nist2"; //กำหนดรหัสของ client 
 
     const API_ACTION = {
@@ -210,6 +210,7 @@ NS(NAMESPACE, NAMECLASS, (() => {
 
     var I18N_CODE = "th-TH";
     var PARAM_IPADDR = "";    //เก็บข้อมูล ip-addr จากการดึงข้อมูล
+    var PARAM_POSITION = "";  //เก็บข้อมูล position เครื่องที่ทำการแสกน
     var PARAM_PERMIT_QR = ""; //เก็บข้อมูล qr-code จาก require-url
 
     function TTL_LOCALSTOREAGE(prefix) {
@@ -477,6 +478,18 @@ NS(NAMESPACE, NAMECLASS, (() => {
             
             this.switch_language();
         },
+        display_unsubscript: function (data) {
+            let me = this;
+            let cp = me.component;
+            //------
+            this.display_error("");
+            //------
+            cp.container.classList.add("unsubscript");
+            cp.container.classList.remove("loader");
+            cp.container.classList.add("ready");
+            //-----
+            this.switch_language();
+        },
         //-----
         render_info: function (data, is_private = false) {
             let me = this;
@@ -685,7 +698,12 @@ NS(NAMESPACE, NAMECLASS, (() => {
                     return "";
                 }
             },
-            
+            /**ดึงข้อมูล geo-location*/
+            position: function () {
+                return new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true });
+                });
+            }, 
             public: async function () {
 
                 let me = this;
@@ -706,6 +724,7 @@ NS(NAMESPACE, NAMECLASS, (() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
                 PARAM_IPADDR = PARAM_IPADDR != "" ? PARAM_IPADDR : await me.fetch_data.ipaddr.call(me);
+                PARAM_POSITION = PARAM_POSITION != "" ? PARAM_POSITION : await me.fetch_data.position.call(me);
 
                 const controller = new AbortController();
                 const tid = setTimeout(() => controller.abort(), TIMEOUT_FETCH);
@@ -722,7 +741,12 @@ NS(NAMESPACE, NAMECLASS, (() => {
                             "action"        : API_ACTION["permit-public"], 
                             "user-agent"    : navigator.userAgent,
                             "ip-addr"       : PARAM_IPADDR,
-                            "opt-direct": OPT_DIRECT,
+                            "position": {
+                                lat: PARAM_POSITION.coords ? PARAM_POSITION.coords.latitude : 0.00,
+                                lng: PARAM_POSITION.coords ? PARAM_POSITION.coords.longitude : 0.00,
+                                acc: PARAM_POSITION.coords ? PARAM_POSITION.coords.accuracy : 0.00
+                            },
+                            "opt-direct"    : OPT_DIRECT,
                             //-----
                             "permit-qr"     : PARAM_PERMIT_QR
                         })
@@ -742,15 +766,20 @@ NS(NAMESPACE, NAMECLASS, (() => {
                     if (res && res.status == "fail") { me.display_notfound();  return; }
                     if (res && res.status == "") { me.display_notfound();  return; }
                     //-----
+                    if (res && res.config && !res.config["is-subscript"]) { me.display_unsubscript(res.data); return 0; }
+
+
                     if (!res.data) { me.display_notfound(); return; }
 
-                    if (res.data["is-lost"]) { me.display_lost(res.data); return 0;}
+                    if (res.data["is-lost"]) { me.display_lost(res.data); return 0; }
+                    
                     if (!res.data["is-regist"]) { me.render_form(res.data); return 0; }
-
+                    
                     me.render_info(res.data);
 
                     cp.container.classList.remove("loader");
                     cp.container.classList.add("ready");
+
                 } catch (e) {
 
                     clearTimeout(tid);
@@ -782,7 +811,8 @@ NS(NAMESPACE, NAMECLASS, (() => {
 
                 cp.container.classList.add("loader");
 
-                PARAM_IPADDR = PARAM_IPADDR != "" ? PARAM_IPADDR:  await me.fetch_data.ipaddr.call(me);
+                PARAM_IPADDR = PARAM_IPADDR != "" ? PARAM_IPADDR : await me.fetch_data.ipaddr.call(me);
+                PARAM_POSITION = PARAM_POSITION != "" ? PARAM_POSITION : await me.fetch_data.position.call(me);
 
                 const controller = new AbortController();
                 const tid = setTimeout(() => controller.abort(), TIMEOUT_FETCH);
@@ -799,6 +829,11 @@ NS(NAMESPACE, NAMECLASS, (() => {
                             "action"        : API_ACTION["permit-private"],
                             "user-agent"    : navigator.userAgent,
                             "ip-addr"       : PARAM_IPADDR,
+                            "position": {
+                                lat: PARAM_POSITION.coords ? PARAM_POSITION.coords.latitude : 0.00,
+                                lng: PARAM_POSITION.coords ? PARAM_POSITION.coords.longitude : 0.00,
+                                acc: PARAM_POSITION.coords ? PARAM_POSITION.coords.accuracy : 0.00
+                            },
                             "opt-direct"    : OPT_DIRECT,
                             //-----
                             "permit-qr"     : PARAM_PERMIT_QR,
@@ -824,21 +859,11 @@ NS(NAMESPACE, NAMECLASS, (() => {
                         return;
                     }
 
-                    if (!res.data) {
-                        me.display_notfound();
-                        return;
-                    }
+                    if (!res.data) { me.display_notfound(); return;}
+                    if (!res.data["is-regist"]) { me.render_form(res.data); return 0;}
+                    if (!res.data["is-subscript"]) { me.display_unsubscript(res.data); return 0; }
 
-                    if (!res.data["is-regist"]) {
-                        me.render_form(res.data);
-                        return 0;
-                    }
-
-                    if (res.data["is-lost"]) {
-                        me.display_lost(res.data);
-                        return 0;
-                    }
-
+                    if (res.data["is-lost"]) { me.display_lost(res.data); return 0; }
 
                     me.render_info(res.data, true);
 
@@ -924,6 +949,12 @@ NS("App.Module", INSTANCE, new (NS(NAMESPACE, NAMECLASS))());
 
 /**
  * HISTORY
+ * 
+ * 20260609:2.1.0
+ * - Added : เพิ่มการเก็บค่า Geo-Location จากผู้แสกนเพื่อระบุตำแหน่ง
+ * 
+ * 20260304:2.0.7
+ * - Fixed : กำหนดค่า content-type ของ fetch() เป็น "plain-text" ให้ตรงกับ appscript เพื่อให้เงิอนไขตรงกันผ่านไปยัง json.parse()
  * 
  * 20260109:2.0.6
  * - Added : เพิ่มฟิลด์ข้อมูล owner-type เก็บข้อมูลประเภทผู้ใช้สิทธิ์
