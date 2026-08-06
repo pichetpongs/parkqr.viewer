@@ -441,22 +441,22 @@ body div#frm-regist div.field-vehicle div {
   z-index: 1;
   border-radius: 20px;
 }
-body div#frm-regist.vehicle-type-car div.field-vehicle {
+body div#frm-regist.label-type-car div.field-vehicle {
   display: block;
 }
-body div#frm-regist.vehicle-type-car div.field-vehicle div {
+body div#frm-regist.label-type-car div.field-vehicle div {
   background-image: url("../image/vehicle-type-car06.png");
 }
-body div#frm-regist.vehicle-type-car div.field-vehicle:nth-of-type(2) div {
+body div#frm-regist.label-type-car div.field-vehicle:nth-of-type(2) div {
   background-image: url("../image/vehicle-type-car02.png");
 }
-body div#frm-regist.vehicle-type-bike div.field-vehicle {
+body div#frm-regist.label-type-bike div.field-vehicle {
   display: block;
 }
-body div#frm-regist.vehicle-type-bike div.field-vehicle:nth-of-type(2) {
+body div#frm-regist.label-type-bike div.field-vehicle:nth-of-type(2) {
   display: none;
 }
-body div#frm-regist.vehicle-type-bike div.field-vehicle div {
+body div#frm-regist.label-type-bike div.field-vehicle div {
   background-image: url("../image/vehicle-type-bike01.png");
 }
 body div.footer {
@@ -500,8 +500,8 @@ body div.footer div.version {
   font-size: 13px;
 }
 body div#modal-pin div.modal-content {
-  width: 90%;
-  max-width: 340px;
+  width: 80%;
+  max-width: 290px;
   background: #fff;
   border-radius: 10px;
   padding: 24px;
@@ -519,11 +519,11 @@ body div#modal-pin div.modal-content div.otp-wrapper {
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin: 20px 0;
+  margin: 15px 0;
 }
 body div#modal-pin div.modal-content div.otp-wrapper input.otp {
-  width: 48px;
-  height: 56px;
+  width: 42px;
+  height: 50px;
   border: 1px solid #d9d9d9;
   border-radius: 10px;
   text-align: center;
