@@ -20,12 +20,7 @@
       "demo/resource/js/main.js"
     ]
   },
-  {
-    "outputFileName": "demo/resource/style/css/main.min.css",
-    "inputFiles": [
-      "demo/resource/style/css/main.css"
-    ]
-  },
+
   {
     "outputFileName": "nist1/resource/js/main.min.js",
     "inputFiles": [
